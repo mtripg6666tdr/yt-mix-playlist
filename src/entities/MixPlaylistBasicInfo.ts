@@ -3,7 +3,9 @@ import { parseText, sanitizeUrl } from '../helper.js';
 export default class MixPlaylistBasicInfo {
   id: string;
   title: string;
+  /** @deprecated */
   author: string;
+  /** @deprecated */
   url: string | null;
 
   constructor(data: any) {

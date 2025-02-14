@@ -7,6 +7,7 @@ import Thumbnail from './Thumbnail.js';
 const MAX_CONTINUATION_RUNS = 5;
 
 export default class MixPlaylistEndpointItem extends MixPlaylistBasicInfo {
+  /** @deprecated */
   videoCount: string;
   thumbnails: Thumbnail[];
 
@@ -53,7 +54,38 @@ export default class MixPlaylistEndpointItem extends MixPlaylistBasicInfo {
     }
 
     if (Array.isArray(items)) {
-      const itemData = items.find((item) => item?.compactRadioRenderer?.playlistId)?.compactRadioRenderer;
+      const item = items.find((item) => item
+        ?.lockupViewModel
+        ?.contentImage
+        ?.collectionThumbnailViewModel
+        ?.primaryThumbnail
+        ?.thumbnailViewModel
+        ?.overlays
+        ?.find((o: any) => o
+          ?.thumbnailOverlayBadgeViewModel
+          ?.thumbnailBadges
+          ?.[0]
+          ?.thumbnailBadgeViewModel
+          ?.icon
+          ?.sources
+          ?.find((s: any) => s?.clientResource?.imageName === 'MIX')
+        )
+      );
+      const itemData = Object.assign(
+        {},
+        {
+          videoCountText: null,
+          thumbnail: {
+            thumbnails: item?.lockupViewModel?.contentImage?.collectionThumbnailViewModel?.primaryThumbnail?.thumbnailViewModel?.image?.sources
+          },
+          title: {
+            simpleText: item?.lockupViewModel?.metadata?.lockupMetadataViewModel?.title?.content
+          },
+          longBylineText: 'DUMMY',
+          shareUrl: ''
+        },
+        item?.lockupViewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.watchEndpoint
+      );
 
       if (itemData) {
         return this.#parse(itemData);
