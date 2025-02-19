@@ -42,7 +42,11 @@ export default class MixPlaylist extends MixPlaylistBasicInfo {
     return new MixPlaylist(data, context);
   }
 
-  static async fetch(videoId: string, options?: { gl?: string, hl?: string }): Promise<MixPlaylist | null> {
+  static async fetch(videoId: string, options?: { gl?: string, hl?: string, preferInitialPlaylistGuessing?: boolean }): Promise<MixPlaylist | null> {
+    if (videoId.length !== 11) {
+      throw new Error('Invalid video ID');
+    }
+
     const context: Context = {
       endpointItem: null,
       options: {
@@ -52,7 +56,9 @@ export default class MixPlaylist extends MixPlaylistBasicInfo {
       fetchFn: fetchCookie(nodeFetch)
     };
 
-    const endpointItem = await MixPlaylistEndpointItem.fetch(videoId, context);
+    const endpointItem = options?.preferInitialPlaylistGuessing
+      ? await MixPlaylistEndpointItem.getGuessedEndpointItem(videoId)
+      : await MixPlaylistEndpointItem.fetch(videoId, context);
     if (endpointItem) {
       context.endpointItem = endpointItem;
       return this.#doFetch(videoId, context);

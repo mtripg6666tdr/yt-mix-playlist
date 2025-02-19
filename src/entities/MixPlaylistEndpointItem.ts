@@ -44,6 +44,21 @@ export default class MixPlaylistEndpointItem extends MixPlaylistBasicInfo {
     return parsed;
   }
 
+  static async getGuessedEndpointItem(videoId: string): Promise<MixPlaylistEndpointItem | null> {
+    const guessedItemData = {
+      playlistId: `RD${videoId}`,
+      videoCountText: null,
+      thumbnail: {
+        thumbnails: []
+      },
+      title: {
+        simpleText: 'DUMMY'
+      },
+      longBylineText: 'DUMMY'
+    };
+    return this.#parse(guessedItemData);
+  }
+
   static #findInResults(data: any, isContinuation = false): MixPlaylistEndpointItem | string | null {
     const items = isContinuation ?
       data?.onResponseReceivedEndpoints?.[0]?.appendContinuationItemsAction?.continuationItems :
